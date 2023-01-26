@@ -4,6 +4,7 @@
   "description": "",
   "main": "soma.js",
   "scripts": {
+    "start": "tsx watch src/server.ts",
     "dev": "tsx watch src/server.ts"
   },
   "keywords": [],
