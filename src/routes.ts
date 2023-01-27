@@ -129,22 +129,24 @@ export async function appRoutes(app: FastifyInstance){
         // retornar um array com vários objetos com três info: data, hábitos possiveis e quantos foram completados
 
         const summary = await prisma.$queryRaw`
-            SELECT
-                D.id,
+            SELECT 
+                D.id, 
                 D.date,
                 (
-                SELECT cast(count(*) as float)
+                SELECT 
+                    count(*)::int4
                 FROM day_habits DH
                 WHERE DH.day_id = D.id
                 ) as completed,
                 (
-                SELECT cast(count(*) as float)
-                FROM habit_week_days HWD
+                SELECT
+                    count(*)::int4
+                FROM habit_week_days HDW
                 JOIN habits H
-                    ON H.id = HWD.habit_id
-                WHERE 
-                    HWD.week_day = cast(strftime("%w", D.date/1000.0, "unixepoch") as int)
-                    AND H.created_at < D.date
+                    ON H.id = HDW.habit_id
+                WHERE
+                    HDW.week_day = (extract(isodow from D.date) - 1)
+                    AND H.created_at <= D.date
                 ) as amount
             FROM days D
         `
